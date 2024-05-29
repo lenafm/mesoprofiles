@@ -88,11 +88,12 @@ def get_block_graph(g: gt.Graph, b: gt.VertexPropertyMap) -> gt.Graph:
 
 def get_density_matrix(block_ms, block_ns):
     """
-    Calculates the densities within each block (allowing for self-loops)
+    Calculates the densities within each block
     Parameters
     ----------
     block_ms: 2D array
         Matrix counting the number of edges that exist between pairs of blocks
+        (needs to have twice the number of edges on the diagonal)
     block_ns: 1D array
         Array counting the number of nodes in each block
     Returns
@@ -106,16 +107,12 @@ def get_density_matrix(block_ms, block_ns):
         for s in range(len(block_ns)):
             n_s = block_ns[s]
             m = block_ms[r,s]
-            if r == s:
-                n = n_r
-                if n == 0:
-                    ps[r, s] = 0
-                else:
-                    ps[r, s] = m / (n ** 2)
-
+            if n_r == 0 or n_s == 0:
+                ps[r, s] = 0
             else:
-                if n_r == 0 or n_s == 0:
-                    ps[r, s] = 0
+                if r == s:
+                    ps[r, s] = m / (n_r * (n_r - 1)) #/2 accounted for by m being twice the number of edges
+
                 else:
                     ps[r, s] = m / (n_r * n_s)
     return ps

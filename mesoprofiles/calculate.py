@@ -18,7 +18,7 @@ def calculate_mesoprofile(state: Optional[gt.BlockState] = None,
 
 def get_block_pair_relationships(ps, block_ns):
     """
-    Implementation of between community motifs from Betzel et al. (2018), extended for directed case.
+    Implementation of between community motifs from Betzel et al. (2018).
     Parameters
     ----------
     ps: 2D array
@@ -41,20 +41,20 @@ def get_block_pair_relationships(ps, block_ns):
                 omega_ss = ps[s, s]
                 if min(omega_rr, omega_ss) > omega_rs:
                     M_rs = 'a'
-                elif omega_rr > omega_rs > omega_ss:
+                elif omega_rr > omega_rs >= omega_ss or omega_rr >= omega_rs > omega_ss:
                     M_rs = 'c_p'
-                elif omega_ss > omega_rs > omega_rr:
+                elif omega_ss > omega_rs >= omega_rr or omega_ss >= omega_rs > omega_rr:
                     M_rs = 'p_c'
                 elif omega_rs > max(omega_rr, omega_ss):
                     M_rs = 'd'
                 else:
-                    M_rs = 'other'
+                    M_rs = 'n'
                 if M_rs is not None:
                     M[(r, s)] = M_rs
     return M
 
 
-def calculate_role_probabilities(block_pair_relationships, B, directed=False):
+def calculate_role_probabilities(block_pair_relationships, B):
     roles = {}
     for r in range(B):
         roles_r = []
@@ -68,7 +68,7 @@ def calculate_role_probabilities(block_pair_relationships, B, directed=False):
 
 
 def calculate_block_role_probabilities(roles):
-    possible_roles = ['a', 'c', 'p', 'd', 'other']
+    possible_roles = ['a', 'c', 'p', 'd', 'n']
     block_roles = dict(Counter(roles))
     n_roles = sum(block_roles.values())
     return {role: block_roles[role]/n_roles if role in block_roles else 0. for role in possible_roles}
@@ -76,5 +76,8 @@ def calculate_block_role_probabilities(roles):
 
 def calculate_node_role_proabilities(b, role_probabilities):
     block_labels = b.a
-    role_probabilities_nodes = np.array([list(role_probabilities[block].values()) for block in block_labels])
-    return np.sum(role_probabilities_nodes, axis=0)/len(role_probabilities_nodes)
+    node_roles = np.array([list(role_probabilities[block].values()) for block in block_labels])
+    node_role_frequencies = np.sum(node_roles, axis=0)
+    if np.sum(node_role_frequencies) == 0:
+        return np.array([0., 0., 0., 0., 1.])
+    return node_role_frequencies/len(node_roles)
