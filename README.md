@@ -1,5 +1,9 @@
 # Mesoprofiles
 
+Mesoprofiles is based on the work in
+
+_Betzel, Richard F., John D. Medaglia, and Danielle S. Bassett. "Diversity of meso-scale architecture in human and non-human connectomes." Nature communications 9.1 (2018): 346._
+
 Let $R_{rs}$ denote the role that a blocks $r$ has with respect to its relationship to another block $s$. Depending on the relative edge densities within- and between blocks $r$ and $s$, $R_{rs}$ can take on one of the following roles: 
 
 * a = assortative
